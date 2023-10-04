@@ -1,0 +1,53 @@
+.parent-container {
+  position: relative;
+  z-index: 1; 
+  height: 64.4vh;
+
+}
+
+.login-container {
+  background-color: #007bff !important;
+  background-image: url('/src/page/login/log1.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
+  font-family: 'Gilroy', sans-serif;
+  height: 155.2%;
+  position: relative; 
+  z-index: 0; 
+}
+
+.login-container::after {
+  content: "";
+  position: absolute; 
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(3, 169, 244, 0.8);
+  z-index: -1;
+}
+
+.notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: red; 
+  color: white; 
+  padding: 10px 20px; 
+  border-radius: 5px; 
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); 
+  animation: fadeInOut 3s ease-in-out; 
+}
+
+
+@keyframes fadeInOut {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
