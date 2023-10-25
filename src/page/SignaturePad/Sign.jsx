@@ -1,16 +1,21 @@
 import React, { useRef, useState } from "react";
 import SignaturePad from "react-signature-pad";
-import "bootstrap/dist/css/bootstrap.css";
 import SignatureCanvas from "react-signature-canvas";
+import { useTheme } from "@mui/material/styles";
+import "bootstrap/dist/css/bootstrap.css";
 import Cookies from "js-cookie";
 import axios from "axios";
 
-const SignaturePage = () => {
+const SignaturePage = ({searchId}) => {
   const salesmanSignatureRef = useRef(null);
   const customerSignatureRef = useRef(null);
 
+
   const [salesmanSignatureData, setSalesmanSignatureData] = useState(null);
   const [customerSignatureData, setCustomerSignatureData] = useState(null);
+  const theme=useTheme()
+  // const penColor=theme.palette.mode==='dark' ?"white":"black";
+  const penColor='cyan'
 
   const handleSalesmanClear = () => {
     salesmanSignatureRef.current.clear();
@@ -66,14 +71,18 @@ try{
         <div className="col-md-6">
           <h3>Site Assessor Signature</h3>
           <div className="border p-3">
-            <SignaturePad ref={salesmanSignatureRef} width={400} height={200} />
-            <div></div>
+          <SignatureCanvas
+              ref={salesmanSignatureRef}
+              penColor={penColor}
+              canvasProps={{ width: 600, height: 200 }}
+            />
+           
           </div>
           <div className="mt-3">
             <button
-              className="btn btn-info mr-6"
+              className="btn btn-light "
               style={{
-                color: "white",
+               
                 marginRight: "7px",
               }}
               onClick={handleSalesmanClear}
@@ -81,11 +90,8 @@ try{
               Clear
             </button>
             <button
-              className="btn"
-              style={{
-                backgroundColor: "#03a9f4",
-                color: "white",
-              }}
+              className="btn btn-light"
+             
               onClick={handleSaveSalesman}
             >
               Save
@@ -104,13 +110,16 @@ try{
         <div className="col-md-6">
           <h3>Customer Signature</h3>
           <div className="border p-3">
-            <SignaturePad ref={customerSignatureRef} width={600} height={200} />
+          <SignatureCanvas
+              ref={customerSignatureRef}
+              penColor={penColor}
+              canvasProps={{ width: 600, height: 200 }}
+            />
           </div>
           <div className="mt-3">
             <button
-              className="btn btn-info mr-6"
+              className="btn btn-light"
               style={{
-                color: "white",
                 marginRight: "7px",
               }}
               onClick={handleCustomerClear}
@@ -118,15 +127,24 @@ try{
               Clear
             </button>
             <button
-              className="btn"
-              style={{
-                backgroundColor: "#03a9f4",
-                color: "white",
-              }}
+              className="btn btn-light"
+             
               onClick={handleSaveCustomer}
             >
               Save
             </button>
+            <button
+
+              className="btn btn-light"
+              style={{
+                
+                marginLeft: "425px",
+              }}
+              onClick={handleSubmit}
+              disabled={!(salesmanSignatureData && customerSignatureData)}
+              >
+              Submit
+              </button>
             {customerSignatureData && (
               <div>
                 <h5 style={{ marginTop: "15px" }}>
@@ -138,17 +156,7 @@ try{
             )}
           </div>
         </div>
-        <button
-
-          className="btn btn-info mr-6 col-md-2"
-          style={{
-            color: "white",
-            marginRight: "7px",
-          }}
-          onClick={handleSubmit}
-        >
-          Submit
-        </button>
+       
       </div>
     </div>
   );

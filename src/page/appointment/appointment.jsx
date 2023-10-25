@@ -1,14 +1,15 @@
 import { Box } from "@mui/material";
 import "bootstrap/dist/css/bootstrap.css";
-import React, { useState } from "react";
+import React, { useState,useEffect,useCallback } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
 
-const Appointment = () => {
+const Appointment = ({searchId}) => {
   const [installer, setInstaller] = useState("");
   const [date, setDate] = useState("");
   const [note, setNote] = useState("");
-
+  const[loading,setLoading]=useState(false)
+  const[list,setList]=useState([])
   const handleInstallerChange = (event) => {
     setInstaller(event.target.value);
   };
@@ -37,6 +38,38 @@ let formattedDate = `${year}-${month}-${day}T${hours}:${minutes}:${seconds}.${mi
 return formattedDate
 
   }
+  const fetchInstallers=useCallback(async()=>{
+    const token=Cookies.get('jwtToken')
+    const url='http://localhost:8080/getAllInstallers'
+    const config = {
+      headers: { "Authorization": `Bearer ${token}`}
+    };
+    try{
+      const response= await axios.post(url,config)
+      if(response.status==200){
+        let installerList=[]
+
+        console.log("Responsed recievde sucesfully of installer detail")
+        console.log(response.data)
+        response.data.filter(data=>installerList.push(data.userName))
+        setList(installerList)
+        console.log(installerList)
+      }else{
+        console.log("Error Recieving")
+      }
+    }catch(E){
+      setLoading(true)
+      console.error("Error Sending Request to fetch Installer Detail at appointment")
+    }
+  },[])
+  useEffect(()=>{
+    // setLoading(true)
+    fetchInstallers()
+    return ()=>{
+
+    }
+  },[fetchInstallers])
+  //* ------------Handle Submit Function Below----------
   const handleSubmit = async (event) => {
     event.preventDefault();
  let dateObject=new Date(date);
@@ -107,9 +140,11 @@ console.log(appointmentData)
                       value={installer}
                     >
                       <option data-select2-id="select2-data-9-k35n" />
-                      <option value="A">A</option>
-                      <option value="B">B</option>
-                      <option value="C">C</option>
+                      
+                      {
+                        list.map(name=>{ return <option value={name} key={name}>{name}</option> })
+                      }
+                     
                     </select>
                   </div>
                 </div>

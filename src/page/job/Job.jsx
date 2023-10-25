@@ -1,25 +1,35 @@
-import { Box } from '@mui/material';
+import { Box,Snackbar } from '@mui/material';
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.css';
 import { AuthContext } from './../../contexts/AuthContext';
 import {useForm,Controller} from 'react-hook-form'
+import { Alert } from 'react-bootstrap';
 import axios from 'axios'
-import { useOutletContext,useLocation } from 'react-router-dom';
+import { useOutletContext,useLocation ,useNavigate} from 'react-router-dom';
 import Cookies from 'js-cookie'
 import './../job/JobForm.css'
 import { useState } from 'react';
 
-const Job = () => {
+const Job = ({setSearchId,searchId}) => {
   
   const {register,handleSubmit,control,formState:{errors},setValue}=useForm();
   const token=Cookies.get('jwtToken')
   const location=useLocation();
   const customerDetail=location.state;
   const[readOnly,setReadOnly]=React.useState(false);
+  const [open,setOpen]=React.useState(false)
+  const handleClose=(event,reason)=>{
+    if (reason=='clickaway'){
+      return;
+    }
+    setOpen(false)
+  }
+  const navigate=useNavigate();
   React.useEffect(()=>{
     if(customerDetail){
       console.log("Customer Id :"+customerDetail.project.projectId)
       setReadOnly(true)
+      setSearchId(customerDetail.project.projectId)
       setValue('projectTitle',customerDetail.project.projectTitle)
       setValue('customerFirstName',customerDetail.project.customerFirstName)
       setValue('customerLastName',customerDetail.project.customerLastName)
@@ -37,17 +47,39 @@ const Job = () => {
       setValue('suburb',customerDetail.suburb)
       setValue('state',customerDetail.state)
       setValue('postcode',customerDetail.postcode)
+      setValue('emailId',customerDetail.project.emailId)
+      setValue('systemBrand',customerDetail.project.systemBrand)
     }else{
       console.log("No Customer ID")
     }
   },[])
-  const onSubmit=async(data)=>{
-    
-    // console.log(data.projectTitle)
-    const api="http://localhost:8080/saveBasicDetails"
+// * Update Handling Method
+  const handleUpdatedData=async(data)=>{
+    data.address.project.projectId=searchId;
+    const api=`http://localhost:8080/editBasicDetail/${searchId}`
     const config = {
       headers: { Authorization: `Bearer ${token}` }
     };
+    try{
+      console.log("Just Before Request"+config.headers.Authorization)
+      const response=await axios.put(api,data,config)
+      if(response.status==200){
+        setOpen(true)
+        setReadOnly(true)
+        console.log(response.data)
+    
+        
+      }else{
+        console.log("Fail"+response.data)
+      }
+    
+    }
+    catch(error){
+      console.log("Error from Catch "+error)
+    }
+  }
+  //* Handling Submit Method
+  const onSubmit=async(data)=>{
     const dataObject={
       "address":
   {
@@ -62,7 +94,9 @@ const Job = () => {
           "customerType" :data.customerType ,
           "companyName" : data.companyName,
           "abnNumber":data.abnNumber ,
-          "gstRegistered": data.gstRegistered
+          "gstRegistered": data.gstRegistered,
+          "emailId":data.emailId,
+          "systemBrand":data.systemBrand
       },
       "buildingName": data.buildingName,
       "unitNumber" : data.unitNumber,
@@ -75,12 +109,27 @@ const Job = () => {
       "postcode":data.postcode
     }
 }
+    if(searchId){
+      console.log("Update Case")
+      handleUpdatedData(dataObject)
+      return;
+    }
+    // console.log(data.projectTitle)
+    const api="http://localhost:8080/saveBasicDetails"
+    const config = {
+      headers: { Authorization: `Bearer ${token}` }
+    };
+   
 console.log(dataObject)
 try{
   console.log("Just Before Request"+config.headers.Authorization)
   const response=await axios.post(api,dataObject,config)
   if(response.status==200){
-    console.log("Success"+response.data.project.projectId)
+    setOpen(true)
+    console.log("Success Project Id"+response.data.address.project.projectId);
+      // *Storring Project Id in Cookie
+      Cookies.set("projectId",response.data.address.project.projectId);
+
     
   }else{
     console.log("Fail"+response.data)
@@ -163,20 +212,25 @@ catch(error){
       }
     }
   }
+  const handleUpdate=(e)=>{
+    e.preventDefault();
+    setReadOnly(false)
+  }
 
   return (
   
     <Box component="main" sx={{ flexGrow: 1, p: 2, m: 2 }}>
     
 {/*------------------------------------- Form Starting-------------------------------- */}
-    <form id="job-form" onSubmit={onsubmit} >
+    <form id="job-form" onSubmit={handleSubmit(onSubmit)} >
  
     <div className="col-lg-12">
       <div className="card mb-4">
         <div className="card-body">
           <div className="col-md-12 text-center">
             <h3>
-              <b>Create New Job</b>
+              <b style={{display:readOnly? 'none' : 'block'}}>Create New Job</b>
+              <b style={{display:readOnly? 'block' : 'none'}}>JOB ID : {customerDetail?.project?.projectId}</b>
             </h3>
           </div>
         
@@ -190,9 +244,35 @@ catch(error){
               <div className="col-lg-6">
                 <div className="mb-3">
                   <label className="form-label">Title</label>
-                  <input type="text"  name ="title" className="form-control"{...register("projectTitle",formValidation.projectTitle)}  readOnly={readOnly}/>
-                  {errors?.projectTitle?.type==='pattern' && (<small className='errorMsg'>{formValidation.projectTitle.pattern.message}</small>) } 
-                  {errors?.projectTitle?.type==='required' && (<small className='errorMsg'>{formValidation.projectTitle.required}</small>) } 
+                  {/* <input type="text"  name ="title" className="form-control"{...register("projectTitle",formValidation.projectTitle)}  readOnly={readOnly}/> */}
+                  <Controller
+                
+          name="projectTitle" // This should match the name of the field in your data object
+          control={control}
+          defaultValue="mr" // Set the default value if needed
+          render={({ field }) => (
+            <select {...field}
+            className="select2 form-control select2-hidden-accessible"
+            data-select2-placeholder="Select Customer Type"
+            data-select2-id="select2-data-7-809c"
+            tabIndex={-1}
+            aria-hidden="true"
+            disabled={readOnly}
+            
+            >
+              <option value="mr"  >Mr</option>
+              <option value="mrs">Mrs</option>
+              <option value="miss">Miss</option>
+            </select>
+          )}
+        />
+                </div>
+              </div>
+              <div className="col-lg-6">
+                <div className="mb-3">
+                <label className="form-label">Email</label>
+                <input type="email"  name ="mail" className="form-control"  {...register("emailId")} readOnly={readOnly}/>
+
                 </div>
               </div>
             </div>
@@ -229,8 +309,8 @@ catch(error){
                 <div className="mb-3">
                   <label className="form-label">Phone Number</label>
                   <input type="text"  name ="mobileNo" className="form-control" {...register("customerPhoneNumber",formValidation.mobileNumber)} readOnly={readOnly}/>
-                  {errors?.customerMobileNumber?.type==='pattern' && (<small className='errorMsg'>{formValidation.mobileNumber.pattern.message}</small>) } 
-                  {errors?.customerMobileNumber?.type==='required' && ( <small className='errorMsg'>{formValidation.mobileNumber.required}</small>) } 
+                  {errors?.customerPhoneNumber?.type==='pattern' && (<small className='errorMsg'>{formValidation.mobileNumber.pattern.message}</small>) } 
+                  {errors?.customerPhoneNumber?.type==='required' && ( <small className='errorMsg'>{formValidation.mobileNumber.required}</small>) } 
                 </div>
               </div>
             </div>
@@ -397,7 +477,14 @@ catch(error){
             
             </div>
 
-
+              <div className="row">
+                <div className="col-lg-6">
+                  <div className="mb-3">
+                  <label className="form-label">System Brand</label>
+                <input type="text" className="form-control" {...register("systemBrand")} readOnly={readOnly}/>
+                  </div>
+                </div>
+              </div>
 
             <div className="row">
               {/* Product Options dropdown */}
@@ -662,9 +749,13 @@ catch(error){
             </div>
             <div className="container">
               <div className="col-md-12 text-center">
-                <button className="btn btn-light btn-medium-3 btn-icon-text"   style={{ marginRight: '10px' }}>
+                <button 
+                className="btn btn-light btn-medium-3 btn-icon-text"
+                disabled={!readOnly}  
+                onClick={(e)=>handleUpdate(e)}
+                style={{ marginRight: '10px' }}>
                   {/* ------------------SAVE-------------------------- */}
-                  <i className="bi bi-x" /> <span className="text">Save</span>
+                  <i className="bi bi-x" /> <span className="text">Update</span>
                 </button>
                 {/* -------------------SUBMIT-------------------------------- */}
                 <button className="btn btn-primary btn-medium btn-icon-text" type='submit' disabled={readOnly}>
@@ -678,6 +769,22 @@ catch(error){
     </div>  
 
   </form>
+
+  <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={open}
+        autoHideDuration={3000}
+        onClose={handleClose}
+      >
+        <Alert
+          // onClose={handleClose}
+          // @ts-ignore
+          severity="info"
+          sx={{ width: "100%" }}
+        >
+          Project created successfully
+        </Alert>
+      </Snackbar>
   </Box>
   );
 };

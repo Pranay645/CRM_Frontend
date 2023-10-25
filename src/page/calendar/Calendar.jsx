@@ -5,8 +5,10 @@ import { Paper, Stack } from "@mui/material";
 import { formatDate } from "@fullcalendar/core";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-
+import Cookies from "js-cookie";
 import "./calendar.css";
+import { useEffect } from "react";
+import axios from "axios";
 
 function renderEventContent(eventInfo) {
   return (
@@ -35,7 +37,42 @@ function renderSidebarEvent(event) {
 const Calendar = () => {
   const [weekendsVisible, setweekendsVisible] = useState(true);
   const [currentEvents, setcurrentEvents] = useState([]);
-
+  const[schedulerData,setSchedulerData]=useState([])
+  const[loading,setLoading]=useState(true);
+  let newData=[];
+  useEffect(()=>{
+    const api="http://localhost:8080/getSchedule"
+    const token=Cookies.get('jwtToken')
+    const config = {
+      headers: { Authorization: `Bearer ${token}` }
+    };
+    const fetchTask=async()=>{
+      try{
+        const response= await axios.get(api,config)
+        if(response.status==200){
+          console.log("Response recived Sucesfully!!!")
+          // console.log(response.data);
+          newData=response.data;
+           newData=newData.map((data)=>{ return {
+            id:data.scheduleId.toString(),
+            title:data.projectId+" "+data.userIdOfInstaller,
+            start:data.scheduleDate.toString(),
+            end:data.scheduleDate.toString(),
+          }});
+          initialEvents.concat(newData)
+          console.log(response.data)
+          setSchedulerData(newData)
+        }
+      }catch(E){
+        console.log("Error Sending Request"+E)
+      }
+    }
+    fetchTask()
+    return ()=>{
+      setSchedulerData(newData)
+    }
+    
+  },[])
   const handleWeekendsToggle = () => {
     setweekendsVisible(!weekendsVisible);
   };
@@ -63,18 +100,33 @@ const Calendar = () => {
   };
 
   const handleEventClick = (clickInfo) => {
-    if (
-      confirm(
-        `Are you sure you want to delete the task '${clickInfo.event.title}'`
-      )
-    ) {
-      clickInfo.event.remove();
-    }
+    // if (
+    //   confirm(
+    //     `Are you sure you want to delete the task '${clickInfo.event.title}'`
+    //   )
+    // ) {
+    //   clickInfo.event.remove();
+    // }
+    alert(clickInfo.event.title)
   };
 
   const handleEvents = (events) => {
     setcurrentEvents(events);
   };
+  const initialEvents = [
+    {
+      id: "1",
+      title: "Task 1",
+      start: "2023-10-23",
+      end: "2023-10-23",
+    },
+    {
+      id: "2",
+      title: "Task 2",
+      start: "2023-10-24",
+      end: "2023-10-24",
+    }
+  ];
 
   return (
     <Stack direction={"row"}>
@@ -93,15 +145,16 @@ const Calendar = () => {
           headerToolbar={{
             left: "prev,next today",
             center: "title",
-            right: "dayGridMonth,timeGridWeek,timeGridDay",
+            right: "dayGridMonth",
           }}
           initialView="dayGridMonth"
-          editable={true}
-          selectable={true}
+          editable={false}
+          selectable={false}
           selectMirror={true}
           dayMaxEvents={true}
           weekends={weekendsVisible}
-          // initialEvents={INITIAL_EVENTS} // alternatively, use the `events` setting to fetch from a feed
+         events={schedulerData}
+           initialEvents={schedulerData} // alternatively, use the `events` setting to fetch from a feed
           select={handleDateSelect}
           eventContent={renderEventContent} // custom render function
           eventClick={handleEventClick}

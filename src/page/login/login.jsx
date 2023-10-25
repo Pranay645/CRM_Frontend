@@ -4,7 +4,7 @@ import axios from 'axios'
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from "./../../contexts/AuthContext";
 import Cookies from 'js-cookie'
-
+// import jw
 import './login.css'; 
 
 function Login() {
@@ -48,9 +48,10 @@ function Login() {
           }else{
             console.log('Login successful:', response.data);
             // updateToken(response.data.token);
-            Cookies.set("jwtToken",response.data.token,{expires:1})
+            Cookies.set("jwtToken",response.data.token)
             Cookies.set("userRole",response.data.userRole)
             Cookies.set("userName",data.userName)
+            Cookies.set("refreshToken",response.data.uuid)
             updateStatus(true)
             updateRole(response.data.userRole);
             navigate("/app"); 

@@ -6,7 +6,7 @@ import SignaturePad from "react-signature-pad";
 import Cookies from "js-cookie";
 import axios from "axios";
 
-const Installer = () => {
+const Installer = ({searchId}) => {
   const [document1File, setDocument1File] = useState(null);
   const [document2File, setDocument2File] = useState(null);
   const [document3File, setDocument3File] = useState(null);
@@ -294,7 +294,7 @@ try{
             {customerSignatureData && (
               <div>
                 <h5 style={{ marginTop: "15px" }}>
-                  Assessor Signature Result:
+                  Customer Signature Result:
                 </h5>
                 <img src={customerSignatureData} alt="Salesman Signature" />
               </div>
@@ -331,7 +331,7 @@ try{
               <div>
                 <h5 style={{ marginTop: "15px" }}>
                   {" "}
-                  Customer Signature Result:
+                  Installer Signature Result:
                 </h5>
                 <img src={installerSignatureData} alt="Customer Signature" />
               </div>

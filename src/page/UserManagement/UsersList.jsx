@@ -19,16 +19,16 @@ import CancelIcon from "@mui/icons-material/Cancel";
 import { Box } from "@mui/material";
 import Cookies from "js-cookie";
 import axios from "axios";
-
+import { useNavigate } from "react-router-dom";
 
 const initialData = [
   {
     id: 1,
     name: "Deep Sharma",
     role: "Admin",
-    mobile: "+617046535398",
+    // mobile: "+617046535398",
     email:"pgupta@675@gmail.com",
-    username: "deepsharma",
+    // username: "deepsharma",
     password: "password123",
   },
   {
@@ -45,10 +45,9 @@ const initialData = [
 const UsersList = () => {
 
   const [isAddUserSaved, setIsAddUserSaved] = useState(true);
-  // const [data, setData] = useState(initialData);
   const [editingId, setEditingId] = useState(null);
   const [editedName, setEditedName] = useState("");
-  
+  const navigate=useNavigate();
   const [editedRole, setEditedRole] = useState("");
   const [editedMobile, setEditedMobile] = useState("");
   const[editedEmail,setEditedEmail]=useState("");
@@ -63,7 +62,7 @@ const UsersList = () => {
 
   const [data, setData] = useState([]);
   let fetchedData=[];
-  const [loading,setLoading]=useState(true)
+  const [loading,setLoading]=useState(false)
 
   const isMobileValid = (mobile) => {
     return /^[+]\d{12}$/.test(mobile);
@@ -93,12 +92,8 @@ const UsersList = () => {
     setEditedPassword(userToEdit.userPassword);
   };
 
-  const handleSave = (id) => {
+  const handleSave = async(id) => {
     let isDataValid = true;
-
-
-    
-
     if (!isValidEmail(editedEmail)) {
       setMobileValid("Please enter valid Email address");
       isDataValid = false;
@@ -128,38 +123,57 @@ const UsersList = () => {
     }
 
     if (isDataValid) {
-      setLoading(true);
+      // setLoading(true);
       try{
+        const api=`http://localhost:8080/admin/users/edit/${id}`
+        const token=Cookies.get('jwtToken')
+        const data={
+          "userId": id,
+          "userName": editedUsername,
+          "userEmail": editedEmail,
+          "userPassword": editedPassword,
+          "userRole": editedRole
+        }
+        
+        const config = {
+          headers: { Authorization: `Bearer ${token}` }
+        };
 
+        const response =await axios.put(api,data,config)
+
+        if(response.status==200){
+          console.log("User Edited Sucessfully!!!")
+          console.log(response.data)
+        }
       }catch(e){
         console.error("Error Sending Request to Update")
       }
       const updatedData = data.map((user) => {
-        if (user.id === id) {
+        if (user.userId == id) {
           return {
             ...user,
-            name: editedName,
-            role: editedRole,
-            mobile: editedMobile,
-            username: editedUsername,
-            password: editedPassword,
+            userId:id,
+            userName: editedUsername,
+            userRole: editedRole,
+            userEmail:editedEmail,
+            userPassword:editedPassword,
           };
         }
-        return user;
+
+          return user;
+        
       });
 
-      setData(updatedData);
       setEditingId(null);
-
+      setData(updatedData);
       setIsAddUserSaved(true);
 
     }
   };
 
   const handleCancel = () => {
-    setEditedName("");
-    if (editingId && !initialData.find((user) => user.id === editingId)) {
-      const newData = data.filter((item) => item.id !== editingId);
+    if (editingId && !data.find((user) => user.userId === editingId)) {
+      const newData = data.filter((item) => item.userId !== editingId);
       setData(newData);
     }
     setEditedName("");
@@ -171,36 +185,16 @@ const UsersList = () => {
   };
 
   const handleDelete = (id) => {
-    const newData = data.filter((item) => item.id !== id);
+    const newData = data.filter((item) => item.userId !== id);
     setData(newData);
   };
 
   const handleAddUser = () => {
-
-    if (!isAddUserSaved) {
-      return;
-    }
-    const newUser = {
-      id: data.length + 1,
-      name: "",
-      role: "Admin",
-      mobile: "",
-      username: "",
-      password: "",
-    };
-  
-    setEditedName("");
-    setEditedRole("Admin");
-    setEditedMobile("");
-    setEditedUsername("");
-    setEditedPassword("");
-    // setData([newUser, ...data]);
-    setEditingId(newUser.id);
-
-    setIsAddUserSaved(false);
+     navigate("/app/salesman/form");
   };
 
   React.useEffect(()=>{
+    setLoading(true)
     const fetchUrl="http://localhost:8080/admin/users/all"
     const token=Cookies.get('jwtToken')
     const config = {
@@ -212,10 +206,11 @@ const UsersList = () => {
           const response=await axios.get(fetchUrl,config)
           if(response.status==200){
               console.log("Data Recieved Sucessfully");
-              console.log(response.data[0])
+              // console.log(response.data[0])
               try{
 
                 fetchedData=response.data;
+                setData(response.data)
               }catch(e){
                   console.log("error"+e)
               }
@@ -231,12 +226,13 @@ const UsersList = () => {
         setLoading(false)
       }
     }
-    if(loading){
-   fetchData(); 
-    }
-    return ()=>{
-      console.log("Do Nothing")
-        setData(fetchedData) 
+   if(!loading){
+     fetchData(); 
+     setData(fetchedData) 
+     setLoading(false)
+   }
+    
+   return ()=>{
     }
   },[loading])
   

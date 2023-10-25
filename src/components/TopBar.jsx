@@ -19,6 +19,7 @@ import Avatar from "@mui/material/Avatar";
 // @ts-ignore
 import User from "./man.jpg";
 import Cookies from "js-cookie";
+import { AuthContext } from "./../contexts/AuthContext";
 
 const drawerWidth = 240;
 
@@ -45,6 +46,7 @@ const TopBar = ({ handleDrawerOpen, open, setMode }) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState(null);
   const userName=Cookies.get("userName")
+  const {updateStatus}=React.useContext(AuthContext)
 
 
   const handleMenuOpen = (event) => {
@@ -58,7 +60,15 @@ const TopBar = ({ handleDrawerOpen, open, setMode }) => {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    navigate("/");
+    updateStatus(false)
+    Cookies.remove('jwtToken');
+    Cookies.remove("userRole")
+    Cookies.remove('refreshToken');
+    Cookies.remove('projectId')
+    Cookies.remove('userName')
+    //TODO May be advance the below logic
+   window.location.reload(); 
+        navigate("/");
   };
 
   return (

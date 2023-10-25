@@ -105,9 +105,10 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 
 const SideBar = ({ open, handleDrawerClose }) => {
   const {userRole} =React.useContext(AuthContext);
+  const[loading,setLoading]=React.useState(true)
   const [hoveredIcon, setHoveredIcon] = React.useState(null);
   React.useEffect(()=>{
-    console.log("SIde bar loaded")
+    // console.log("SIde bar loaded")
     const role=Cookies.get("userRole")
     // console.log("UserRole :"+role)
   if(role=='admin'){
@@ -116,19 +117,37 @@ const SideBar = ({ open, handleDrawerClose }) => {
       icon: <ManageAccountsOutlinedIcon />,
       path: "salesman/users",
     })
-    Array2.push({
+    Array2.unshift({
       text: "Add User",
       icon: <PersonAddAltOutlinedIcon />,
       path: "salesman/form",
     })
-  } 
+    setLoading(false)
+  } else if(role=='installer'){
+    Array1.pop();
+    Array1.pop()
+    setLoading(false)
+  }
   return ()=>{
     if(role=='admin'){
       Array1.pop();
-      Array2.pop()
+      Array2.shift()
+      setLoading(false)
+    }else if(role=='installer'){
+      Array1.push({
+        text: "Customers List",
+        icon: <ContactsOutlinedIcon />,
+        path: "salesman/customer",
+      })
+      Array1.push({
+        text: "Create New Job",
+        icon: <EngineeringOutlinedIcon />,
+        path: "salesman/StepWizard",
+      })
+      setLoading(false)
     }
   }
-},[])
+},[loading])
   //*Role based rendering
   //TODO Add protection to routes also
    
@@ -186,6 +205,7 @@ const SideBar = ({ open, handleDrawerClose }) => {
                 onMouseEnter={() => setHoveredIcon(item.path)}
                 onMouseLeave={() => setHoveredIcon(null)}
                 onClick={() => {
+                 
                   navigate(item.path);
                 }}
                 sx={{
@@ -233,6 +253,15 @@ const SideBar = ({ open, handleDrawerClose }) => {
                 onMouseEnter={() => setHoveredIcon(item.path)}
                 onMouseLeave={() => setHoveredIcon(null)}
                 onClick={() => {
+                  if(item.text=='Logout'){
+                    // console.log("Logging out")
+                    Cookies.remove('jwtToken');
+                    Cookies.remove("userRole")
+                    Cookies.remove('refreshToken');
+                    Cookies.remove('projectId')
+                    Cookies.remove('userName')
+                    navigate(item.path);
+                  }
                   navigate(item.path);
                 }}
                 sx={{

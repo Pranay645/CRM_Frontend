@@ -10,14 +10,16 @@ import Questions from './../questions/questions';
 import Sign from '../../page/SignaturePad/Sign.jsx';
 import Appointment from '../../page/appointment/appointment.jsx';
 import Installer from './../Installer/Installer';
+import Files from './../Files/files';
 
 
-const steps = ['Create New Job', 'Answer Queries', 'Authorize(E-Sign)','Schedule','Installer'];
+const steps = ['Create New Job', 'Answer Queries','Files & Photos','Authorize(E-Sign)','Schedule','Installer'];
 
 export default function Steps() {
   const [activeStep, setActiveStep] = React.useState(0);
   const [skipped, setSkipped] = React.useState(new Set());
-
+  const [searchId,setSearchId]=React.useState(null)
+  
   const isStepOptional = (step) => {
     return step === 1;
   };
@@ -27,17 +29,20 @@ export default function Steps() {
   };
 
   const handleNext = () => {
-    let newSkipped = skipped;
-    if (isStepSkipped(activeStep)) {
-      newSkipped = new Set(newSkipped.values());
-      newSkipped.delete(activeStep);
-    }
+    // let newSkipped = skipped;
+    // if (isStepSkipped(activeStep)) {
+    //   newSkipped = new Set(newSkipped.values());
+    //   newSkipped.delete(activeStep);
+    // }
 
+    // setActiveStep((prevActiveStep) => prevActiveStep + 1);
+    // setSkipped(newSkipped);
+    window.scrollTo(0,0);
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
-    setSkipped(newSkipped);
   };
 
   const handleBack = () => {
+    window.scrollTo(0,0)
     setActiveStep((prevActiveStep) => prevActiveStep - 1);
   };
 
@@ -93,11 +98,12 @@ export default function Steps() {
       ) : (
         <React.Fragment>
 
-          {activeStep === 0 && <Job/>}
-          {activeStep === 1 && <Questions/>}
-          {activeStep === 2 && <Sign/>}
-          {activeStep === 3 && <Appointment/>}
-          {activeStep===4 && <Installer/>}
+          {activeStep === 0 && <Job setSearchId={setSearchId} searchId={searchId} /> }
+          {activeStep === 1 && <Questions searchId={searchId}/>}
+          {activeStep === 2 && <Files searchId={searchId}/>}
+          {activeStep === 3 && <Sign searchId={searchId}/>}
+          {activeStep === 4 && <Appointment searchId={searchId}/>}
+          {activeStep===5 && <Installer searchId={searchId}/>}
           <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
             <Button
               color="inherit"

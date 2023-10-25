@@ -5,10 +5,12 @@ import CssBaseline from "@mui/material/CssBaseline";
 import TopBar from "./components/TopBar";
 import SideBar from "./components/SideBar";
 import { ThemeProvider } from "@emotion/react";
-import { Outlet,useLocation } from "react-router-dom";
+import { Outlet,useLocation ,useNavigate} from "react-router-dom";
 import getDesignTokens from "./theme";
 import { AuthContext } from "./contexts/AuthContext";
 import AuthContextProvider from "./contexts/AuthContext";
+import Cookies from "js-cookie";
+import axios from "axios";
 
 const DrawerHeader = styled("div")(({ theme }) => ({
   display: "flex",
@@ -20,12 +22,56 @@ const DrawerHeader = styled("div")(({ theme }) => ({
 
 export default function App() {
   const [open, setOpen] = React.useState(false);
-  const{userRole}=React.useContext(AuthContext)
-  
+  const{userRole,loginStatus}=React.useContext(AuthContext)
+  const navigate=useNavigate();
  React.useEffect(()=>{
   console.log("App Loaded");
   // console.log("UserRole"+userRole)
 
+ 
+  return()=>{
+    const refreshToken=Cookies.get("refreshToken");
+    const getNewToken=async()=>{
+
+      if(refreshToken!=null && loginStatus){
+        const date = new Date();
+const hours = date.getHours();
+const minutes = date.getMinutes();
+const seconds = date.getSeconds();
+console.log("Token :"+refreshToken)
+console.log(hours + ":" + minutes + ":" + seconds);
+        const url="http://localhost:8080/refreshToken"
+        const data={"uuid":refreshToken}
+        try{
+          const response=await axios.post(url,data)
+          if(response.status==200){
+            console.log("Refeshed Token Fetched Sucessfully ")
+            console.log(response.data);
+            if(response.data=='IMPROPER CREDENTIALS PROVIDED, TRY AGAIN'){
+              //*Logout Logic
+              Cookies.remove('jwtToken');
+              Cookies.remove("userRole")
+              Cookies.remove('refreshToken');
+              Cookies.remove('projectId')
+              Cookies.remove('userName')
+              //TODO May be advance the below logic
+            window.location.reload(); 
+                  navigate("/");
+                  return;
+            }
+            // Cookies.remove("jwtToken");
+            Cookies.set("jwtToken",response.data.token)
+          }
+        }catch(E){
+          console.error("Error in sending request at refreshing Token"+E)
+        }
+      }
+    }
+    const minute = 1000 * 60;
+    // getNewToken();
+    setInterval(getNewToken, minute * 1);
+    console.log("App Ended")
+  }
  },[])
   
   const handleDrawerOpen = () => {

@@ -137,6 +137,7 @@ const SearchBar = () => {
     setSuggestions([]);
   };
   const handleRedirect=(customerData)=>{
+    
     navigate("/app/salesman/StepWizard",{state:customerData})
   }
 

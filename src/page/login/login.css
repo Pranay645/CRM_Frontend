@@ -1,8 +1,7 @@
 .parent-container {
   position: relative;
   z-index: 1; 
-  height: 64.4vh;
-
+  height: 100vh;
 }
 
 .login-container {
