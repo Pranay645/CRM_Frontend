@@ -1,6 +1,7 @@
 -Upload Files Preview Setting 
 -Insatller Preview Setting
--Calendar Functionality insertion
--Adding Extra fields to job and question4
+-Calendar Functionality insertion-----------------DONE
+-Adding Extra fields to job and question4----------------DONE
 -some extra field for installer in user add user
-
+--CustomerType is nulled
+--CSV Button in view modal
