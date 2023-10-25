@@ -55,7 +55,7 @@ const Calendar = () => {
           newData=response.data;
            newData=newData.map((data)=>{ return {
             id:data.scheduleId.toString(),
-            title:data.projectId+" "+data.userIdOfInstaller,
+            title:data.project.projectId+" "+data.installerName,
             start:data.scheduleDate.toString(),
             end:data.scheduleDate.toString(),
           }});

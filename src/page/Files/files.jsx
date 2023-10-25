@@ -85,7 +85,13 @@ const Files = ({searchId}) => {
 
     const onSubmit=async()=>{
       const token=Cookies.get("jwtToken")
-      const projectId=Cookies.get("projectId")
+      let projectId=null;
+      if(searchId){
+        projectId=searchId
+      }else{
+
+        projectId=Cookies.get("projectId")
+      }
       const api="http://localhost:8080/save-question-document?projectId="+projectId
     // console.log("Token above config :  "+token)
     const config = {

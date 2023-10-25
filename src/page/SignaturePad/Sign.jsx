@@ -38,7 +38,13 @@ const SignaturePage = ({searchId}) => {
   };
 
   const handleSubmit=async()=>{
-    const projectId=Cookies.get('projectId')
+    
+    let projectId=null;
+    if(searchId){
+      projectId=searchId
+    }else{
+      projectId=Cookies.get("projectId")
+    }
      const token=Cookies.get('jwtToken')
     const url="http://localhost:8080/sign"
 const config = {
