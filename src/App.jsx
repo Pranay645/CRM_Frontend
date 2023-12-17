@@ -69,7 +69,7 @@ console.log(hours + ":" + minutes + ":" + seconds);
     }
     const minute = 1000 * 60;
     // getNewToken();
-    setInterval(getNewToken, minute * 1);
+    setInterval(getNewToken, minute * 60);
     console.log("App Ended")
   }
  },[])

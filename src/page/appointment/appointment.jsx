@@ -1,8 +1,9 @@
-import { Box } from "@mui/material";
 import "bootstrap/dist/css/bootstrap.css";
 import React, { useState,useEffect,useCallback } from "react";
 import Cookies from "js-cookie";
 import axios from "axios";
+import { Box,Snackbar } from '@mui/material';
+import { Alert } from 'react-bootstrap';
 
 const Appointment = ({searchId}) => {
   const [installer, setInstaller] = useState("");
@@ -10,6 +11,13 @@ const Appointment = ({searchId}) => {
   const [note, setNote] = useState("");
   const[loading,setLoading]=useState(false)
   const[list,setList]=useState([])
+  const [open,setOpen]=React.useState(false)
+  const handleClose=(event,reason)=>{
+    if (reason=='clickaway'){
+      return;
+    }
+    setOpen(false)
+  }
   const handleInstallerChange = (event) => {
     setInstaller(event.target.value);
   };
@@ -69,6 +77,12 @@ return formattedDate
 
     }
   },[fetchInstallers])
+  useEffect(()=>{
+    if(searchId){
+      setInstaller('ShibraTai')
+      setDate('2023-12-30')
+    }
+  },[])
   //* ------------Handle Submit Function Below----------
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -98,6 +112,7 @@ console.log(appointmentData)
       const response= await axios.post(url,appointmentData,config)
       if(response.status==200){
         console.log("Installer Scheduled");
+        setOpen(true)
         console.log(response.data)
       }else{
         console.log("Error Recieving Response");
@@ -171,20 +186,20 @@ console.log(appointmentData)
                   </span>
                 </div>
               </div>
-              <label
+              {/* <label
                 style={{ marginTop: "15px" }}
                 htmlFor="comments"
                 className="form-label"
               >
                 <strong>Note:</strong>
-              </label>
-              <textarea
+              </label> */}
+              {/* <textarea
                 className="form-control"
                 id="Address"
                 rows={5}
                 defaultValue={note}
                 onChange={handleNoteChange}
-              />
+              /> */}
               <div className="btn-group">
                 <button
                   type="submit"
@@ -198,15 +213,9 @@ console.log(appointmentData)
                 >
                   Schedule
                 </button>
-                <button
-                  type="reset"
-                  style={{ marginTop: 10 }}
-                  className="btn btn-danger"
-                >
-                  Cancel
-                </button>
+                
               </div>
-              <hr />
+              
               <span className="help-block">
                 <center>
                   True Hot Water<sup>TM</sup>
@@ -216,6 +225,21 @@ console.log(appointmentData)
           </div>
         </div>
       </form>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={open}
+        autoHideDuration={3000}
+        onClose={handleClose}
+      >
+        <Alert
+          // onClose={handleClose}
+          // @ts-ignore
+          severity="info"
+          sx={{ width: "100%" }}
+        >
+          Installer Scheduled Succesfully
+        </Alert>
+      </Snackbar>
     </Box>
   );
 };

@@ -226,15 +226,16 @@ const UsersList = () => {
         setLoading(false)
       }
     }
-   if(!loading){
-     fetchData(); 
-     setData(fetchedData) 
-     setLoading(false)
-   }
+   
     
    return ()=>{
+    if(!loading){
+      fetchData(); 
+      setData(fetchedData) 
+      setLoading(false)
     }
-  },[loading])
+    }
+  },[])
   
   return (
     <Box component="main" sx={{ flexGrow: 1, p: 2, m: 1 }}>

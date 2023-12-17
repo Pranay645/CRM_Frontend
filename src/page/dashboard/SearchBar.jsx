@@ -25,6 +25,8 @@ const SearchBar = () => {
 
   const [suggestions, setSuggestions] = useState([]);
   const [openDialog, setOpenDialog] = useState(false);
+  const [isSearchButtonDisabled, setIsSearchButtonDisabled] = useState(true);
+  const [showEmptySearchMessage, setShowEmptySearchMessage] = useState(false);
   const [dialogData, setDialogData] = useState({
     "addressId": 0,
     "project": {
@@ -71,6 +73,7 @@ const SearchBar = () => {
               try{
 
                 fetchedData=response.data;
+                setCustomerData(fetchedData)
               }catch(e){
                   console.log("error"+e)
               }
@@ -89,11 +92,15 @@ const SearchBar = () => {
     if(loading){
    fetchData(); 
     }
+      // setCustomerData(fetchedData) 
+    
     return ()=>{
       console.log("Do Nothing")
-        setCustomerData(fetchedData) 
+      setCustomerData(fetchedData) 
+
+         
     }
-  },[loading])
+  },[])
   
   useEffect(() => {
     const handleOutsideClick = (e) => {
@@ -125,6 +132,8 @@ const SearchBar = () => {
     // })
 
     setSuggestions(filteredSuggestions);
+    setIsSearchButtonDisabled(inputValue.trim() === "");
+    setShowEmptySearchMessage(false);
   };
 
   const handleSuggestionClick = (suggestion) => {
@@ -132,7 +141,14 @@ const SearchBar = () => {
     setOpenDialog(true);
     clearSuggestions();
   };
-
+  const handleSearchButtonClick = () => {
+    if (isSearchButtonDisabled) {
+      setShowEmptySearchMessage(true);
+      setTimeout(() => setShowEmptySearchMessage(false), 3000); // 
+    } else {
+      setOpenDialog(true);
+  }
+  };
   const clearSuggestions = () => {
     setSuggestions([]);
   };
@@ -140,7 +156,114 @@ const SearchBar = () => {
     
     navigate("/app/salesman/StepWizard",{state:customerData})
   }
+  const downloadZip=async(id)=>{
+    console.log("Id "+id)
+    let ext=null;
+    const api=`http://localhost:8080/zip?projectId=${id}`
+    // try{
+    //   const resp=await axios.get(api)
+    //   if(resp.status==200){
+    //     console.log("SUCESS!!!")
+    //     console.log(resp.data)
+    //   }
+    // }catch(E){
+    //   console.error("Error in sending request"+E)
+    // }
+    fetch(api,{
+      method: 'GET', // Replace with the appropriate HTTP method (GET, POST, etc.)
+      // headers: {
+      //   'Authorization': `Bearer ${token}` 
+      // },
+    })
+    // check to make sure you didn't have an unexpected failure (may need to check other things here depending on use case / backend)
+    
+   .then(resp =>{
+    if(resp.status === 200) {
+      //  console.log(resp.headers.get('Content-Type'));
+      console.log(resp)
+      // if(resp==false){
+      //   alert("That document not uploaded yet!!!")
+      // }
+        ext=resp.headers.get('Content-Type').split('/')[1]
+        if(ext=='json'){
+             alert("That document not uploaded yet!!!")
+            return;
+        }
+       return resp.blob() }
+       else{
+         return Promise.reject('something went wrong')}})
+         .then(blob => {
+          console.log(ext)
+            // setSelectedFileForView(URL.createObjectURL(blob));
 
+           const url = window.URL.createObjectURL(blob);
+           const a = document.createElement('a');
+     a.style.display = 'none';
+     a.href = url;
+    //  // the filename you want
+     a.download = `ZipForId_${id}.zip`;
+     document.body.appendChild(a);
+     a.click();
+     window.URL.revokeObjectURL(url);
+     // or you know, something with better UX...
+    //  alert('your file has downloaded!'); 
+   })
+   .catch(() => alert('oh no!'));
+  }
+  const downloadCSV=async(id)=>{
+    console.log("Id "+id)
+    let ext=null;
+    const api=`http://localhost:8080/getcsvfile/${id}`
+    // try{
+    //   const resp=await axios.get(api)
+    //   if(resp.status==200){
+    //     console.log("SUCESS!!!")
+    //     console.log(resp.data)
+    //   }
+    // }catch(E){
+    //   console.error("Error in sending request"+E)
+    // }
+    fetch(api,{
+      method: 'GET', // Replace with the appropriate HTTP method (GET, POST, etc.)
+      // headers: {
+      //   'Authorization': `Bearer ${token}` 
+      // },
+    })
+    // check to make sure you didn't have an unexpected failure (may need to check other things here depending on use case / backend)
+    
+   .then(resp =>{
+    if(resp.status === 200) {
+      //  console.log(resp.headers.get('Content-Type'));
+      console.log(resp)
+      // if(resp==false){
+      //   alert("That document not uploaded yet!!!")
+      // }
+        ext=resp.headers.get('Content-Type').split('/')[1]
+        if(ext=='json'){
+             alert("That document not uploaded yet!!!")
+            return;
+        }
+       return resp.blob() }
+       else{
+         return Promise.reject('something went wrong')}})
+         .then(blob => {
+          console.log(ext)
+            // setSelectedFileForView(URL.createObjectURL(blob));
+
+           const url = window.URL.createObjectURL(blob);
+           const a = document.createElement('a');
+     a.style.display = 'none';
+     a.href = url;
+    //  // the filename you want
+     a.download = `CSVForId_${id}.csv`;
+     document.body.appendChild(a);
+     a.click();
+     window.URL.revokeObjectURL(url);
+     // or you know, something with better UX...
+    //  alert('your file has downloaded!'); 
+   })
+   .catch(() => alert('oh no!'));
+  }
 
   return (
     <div className="parent-container2">
@@ -184,12 +307,14 @@ const SearchBar = () => {
                     onChange={(e) => handleInputChange(e, setMobileNumber)}
                   />
                   <IconButton
-                    color="primary"
-                    aria-label="Search"
-                    onClick={() => setOpenDialog(true)}
-                  >
-                    <SearchIcon />
-                  </IconButton>
+                        color="primary"
+                        aria-label="Search"
+                        onClick={handleSearchButtonClick}
+                        disabled={isSearchButtonDisabled}
+                      >
+                        <SearchIcon />
+                    </IconButton>
+                  
                 </div>
               </div>
             </div>
@@ -231,11 +356,26 @@ const SearchBar = () => {
                   dialogData.project.projectId
                 }
               </a> */}
+              {/* ()=>downloadZip(dialogData.project.projectId) */}
               <button 
               className="btn btn-primary" 
               style={{ marginLeft: "655px" }}
               onClick={()=>handleRedirect(dialogData)}
-              >Open {dialogData.project.projectId}</button>
+              >#Project {dialogData.project.projectId}</button>
+              <button
+                className="btn btn-secondary"
+                style={{}}
+                onClick={()=>downloadZip(dialogData.project.projectId)}
+              >
+                Download Zip
+              </button>
+              <button
+                className="btn btn-secondary"
+                style={{}}
+                onClick={()=>downloadCSV(dialogData.project.projectId)}
+              >
+                Download CSV
+              </button>
             </DialogTitle>
 
             <DialogContent>

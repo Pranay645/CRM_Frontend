@@ -1,10 +1,12 @@
 import React, { useState } from "react";
-import { Box } from "@mui/material";
+// import { Box } from "@mui/material";
 import "bootstrap/dist/css/bootstrap.css";
 import { useRef } from "react";
 import SignaturePad from "react-signature-pad";
 import Cookies from "js-cookie";
 import axios from "axios";
+import { Box,Snackbar } from '@mui/material';
+import { Alert } from 'react-bootstrap';
 
 const Installer = ({searchId}) => {
   const [document1File, setDocument1File] = useState(null);
@@ -14,6 +16,13 @@ const Installer = ({searchId}) => {
   const [document5File, setDocument5File] = useState(null);
   const [document6File, setDocument6File] = useState(null);
   const [document7File, setDocument7File] = useState(null);
+  const [open,setOpen]=React.useState(false)
+  const handleClose=(event,reason)=>{
+    if (reason=='clickaway'){
+      return;
+    }
+    setOpen(false)
+  }
 
   const generateDownloadLink = (file) => {
     if (file) {
@@ -87,6 +96,7 @@ try{
   const response=await axios.post(url,formDataObject,config)
   if(response.status==200){
     console.log("Installer Details Updated Sucessfully");
+    setOpen(true)
     console.log(response.data)
   }else{
     console.log("Error in recieving Response")
@@ -364,6 +374,21 @@ try{
 
           </div>
         </div>
+        <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={open}
+        autoHideDuration={3000}
+        onClose={handleClose}
+      >
+        <Alert
+          // onClose={handleClose}
+          // @ts-ignore
+          severity="info"
+          sx={{ width: "100%" }}
+        >
+          Site Details Uploaded/Updated Succesfully
+        </Alert>
+      </Snackbar>
       </div>
     </Box>
   );

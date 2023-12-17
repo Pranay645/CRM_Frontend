@@ -34,9 +34,10 @@ const UserForm = () => {
     control,
     register,
     formState: { errors },
-    reset
+    reset,
+    watch
   } = useForm();
-
+  const userRole=watch('userRole')
   const [open, setOpen] = React.useState(false);
 
   
@@ -86,6 +87,9 @@ const UserForm = () => {
   return (
     <Box component="main" sx={{ flexGrow: 1, p: 2, m: 2 }}>
       <Header title="CREATE USER" subTitle="Create a New User Profile" />
+      
+
+
       <Form onSubmit={handleSubmit(onSubmit)}>
         <Row className="mb-3">
           <Col md={6}>
@@ -133,7 +137,7 @@ const UserForm = () => {
 
           {errors?.userPassword && (
             <Form.Control.Feedback type="invalid">
-              Please provide a valid phone number.
+              Please provide a valid password.
             </Form.Control.Feedback>
           )}
         </Form.Group>
@@ -155,6 +159,33 @@ const UserForm = () => {
             )}
           />
         </Form.Group>
+        {userRole=='installer' && (
+          <>
+          <Form.Group >
+          <Form.Label style={{ marginTop: '10px' }}>Company Name</Form.Label>
+          <Form.Control type="text" placeholder="Enter Company Name" {...register("companyName",{required:userRole==='installer',minLength:8})} />
+
+          {/* {errors?.userPassword && (
+            <Form.Control.Feedback type="invalid">
+              Please provide a valid name.
+            </Form.Control.Feedback>
+          )} */}
+        </Form.Group>
+        <Form.Group>
+        <Form.Label style={{ marginTop: '10px' }}>Company Address</Form.Label>
+        <Form.Control type="text" placeholder="Enter Company Address" {...register("companyAddress",{required:userRole==='installer',minLength:8})} />
+
+        {/* {errors?.userPassword && (
+          <Form.Control.Feedback type="invalid">
+            Please provide a valid Address.
+          </Form.Control.Feedback>
+        )} */}
+      </Form.Group>
+</>
+        )} 
+       
+        
+
 
         <div className="text-right">
           <Button

@@ -13,13 +13,23 @@ import Installer from './../Installer/Installer';
 import Files from './../Files/files';
 
 
-const steps = ['Create New Job', 'Answer Queries','Files & Photos','Authorize(E-Sign)','Schedule','Installer'];
-
+const steps=['Create New Job', 'Answer Queries','Files & Photos','Authorize(E-Sign)','Schedule','Installer'];
 export default function Steps() {
   const [activeStep, setActiveStep] = React.useState(0);
   const [skipped, setSkipped] = React.useState(new Set());
   const [searchId,setSearchId]=React.useState(null)
-  
+  React.useEffect(()=>{
+  //  if(searchId!=null){
+  //   setSteps(['Create New Job', 'Answer Queries','Files & Photos','Schedule','Installer'])
+  //  }else{
+  //   setSteps()
+  //  }
+   
+    
+  //   return ()=>{
+      
+  //   }
+  },[])
   const isStepOptional = (step) => {
     return step === 1;
   };
@@ -101,9 +111,11 @@ export default function Steps() {
           {activeStep === 0 && <Job setSearchId={setSearchId} searchId={searchId} /> }
           {activeStep === 1 && <Questions searchId={searchId}/>}
           {activeStep === 2 && <Files searchId={searchId}/>}
-          {activeStep === 3 && <Sign searchId={searchId}/>}
+          {activeStep === 3  && <Sign searchId={searchId}/>}
           {activeStep === 4 && <Appointment searchId={searchId}/>}
           {activeStep===5 && <Installer searchId={searchId}/>}
+           
+          
           <Box sx={{ display: 'flex', flexDirection: 'row', pt: 2 }}>
             <Button
               color="inherit"

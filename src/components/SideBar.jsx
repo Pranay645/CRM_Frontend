@@ -255,11 +255,23 @@ const SideBar = ({ open, handleDrawerClose }) => {
                 onClick={() => {
                   if(item.text=='Logout'){
                     // console.log("Logging out")
+                    // Cookies.remove('jwtToken');
+                    // Cookies.remove("userRole")
+                    // Cookies.remove('refreshToken');
+                    // Cookies.remove('projectId')
+                    // Cookies.remove('userName')
+                    
+
+
                     Cookies.remove('jwtToken');
                     Cookies.remove("userRole")
                     Cookies.remove('refreshToken');
                     Cookies.remove('projectId')
                     Cookies.remove('userName')
+                    //TODO May be advance the below logic
+                   window.location.reload(); 
+                        navigate("/");
+
                     navigate(item.path);
                   }
                   navigate(item.path);

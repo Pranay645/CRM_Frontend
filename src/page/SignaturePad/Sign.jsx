@@ -1,15 +1,24 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState,useEffect } from "react";
 import SignaturePad from "react-signature-pad";
 import SignatureCanvas from "react-signature-canvas";
 import { useTheme } from "@mui/material/styles";
 import "bootstrap/dist/css/bootstrap.css";
 import Cookies from "js-cookie";
 import axios from "axios";
+import { Box,Snackbar } from '@mui/material';
+import { Alert } from 'react-bootstrap';
+
 
 const SignaturePage = ({searchId}) => {
   const salesmanSignatureRef = useRef(null);
   const customerSignatureRef = useRef(null);
-
+  const [open,setOpen]=React.useState(false)
+  const handleClose=(event,reason)=>{
+    if (reason=='clickaway'){
+      return;
+    }
+    setOpen(false)
+  }
 
   const [salesmanSignatureData, setSalesmanSignatureData] = useState(null);
   const [customerSignatureData, setCustomerSignatureData] = useState(null);
@@ -36,6 +45,14 @@ const SignaturePage = ({searchId}) => {
     const dataURL = customerSignatureRef.current.toDataURL();
     setCustomerSignatureData(dataURL);
   };
+// *Fecth Signs Useeffect
+useEffect(()=>{
+  const token=Cookies.get('jwtToken')
+  const url="http://localhost:8080/sign"
+
+
+
+},[])
 
   const handleSubmit=async()=>{
     
@@ -61,6 +78,7 @@ try{
   const response=await axios.post(url,formDataObject,config)
   if(response.status==200){
     console.log("Signature Uploaded Sucessfully");
+    setOpen(true)
     console.log(response.data)
   }else{
     console.log("Error in recieving Response")
@@ -162,7 +180,21 @@ try{
             )}
           </div>
         </div>
-       
+        <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={open}
+        autoHideDuration={3000}
+        onClose={handleClose}
+      >
+        <Alert
+          // onClose={handleClose}
+          // @ts-ignore
+          severity="info"
+          sx={{ width: "100%" }}
+        >
+          Signature Uploaded/Updated Succesfully
+        </Alert>
+      </Snackbar>
       </div>
     </div>
   );

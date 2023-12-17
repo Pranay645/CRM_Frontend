@@ -1,8 +1,12 @@
--Upload Files Preview Setting 
--Insatller Preview Setting
+-Upload Files Preview Setting ------DONE
 -Calendar Functionality insertion-----------------DONE
 -Adding Extra fields to job and question4----------------DONE
--some extra field for installer in user add user
+-some extra field for installer in user add user-------------DONE
+--CSV Button in view modal----------------------DONE
+-Insatller Preview Setting
 --CustomerType is nulled
---CSV Button in view modal
---Notification
+--Notifications
+--User management delete functions
+--Protected Route
+--Searchbar bug for null entry and initializer search issue++
+--If have to change stepper use search bar to setSearchId and seachId in context api

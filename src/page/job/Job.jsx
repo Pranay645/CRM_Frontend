@@ -197,6 +197,34 @@ catch(error){
 }
 //* ---------------------------VALIDATION-------------------------------------
   const formValidation={
+    postcode:{
+      required:"post-code is required!!!",
+      pattern:{
+        value:/^\d{6}$/,
+        message:"Enter valid post-code number!!!"
+      }
+    },
+    abnNumber:{
+      required:"Input is required!!!",
+      pattern:{
+        value:/^\d{11}$/,
+        message:"Enter valid ABN number!!!"
+      }
+    },
+    companyName:{
+      required:"Input is required!!!",
+      pattern:{
+        value:/^[a-zA-Z0-9\s&.'",\-()]+$/,
+        message:"Enter valid company-name!!!"
+      }
+    },
+    projectEmail:{
+      required:"Input is required!!!",
+      pattern:{
+        value:/^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+        message:"Enter valid email!!!"
+      }
+    },
     projectTitle:{
       required:"Input is required!!!",
       pattern:{
@@ -207,8 +235,8 @@ catch(error){
     mobileNumber:{
       required:"Input is Required",
       pattern:{
-        value:/^\d{10}$/,
-        message:"Input should be number with length 10"
+        value:/^(?:\+614|\(04\)|04|\+614)(?:[ -]?[0-9]){8}$/,
+        message:"Enter valid Australian Number"
       }
     }
   }
@@ -271,8 +299,9 @@ catch(error){
               <div className="col-lg-6">
                 <div className="mb-3">
                 <label className="form-label">Email</label>
-                <input type="email"  name ="mail" className="form-control"  {...register("emailId")} readOnly={readOnly}/>
-
+                <input type="email"  name ="mail" className="form-control"  {...register("emailId",formValidation.projectEmail)} readOnly={readOnly} placeholder='xyz@gmail.com'/>
+                {errors?.emailId?.type==='pattern' && (<small className='errorMsg'>{formValidation.projectEmail.pattern.message}</small>) } 
+                  {errors?.emailId?.type==='required' && (<small className='errorMsg'>{formValidation.projectEmail.required}</small>) }
                 </div>
               </div>
             </div>
@@ -281,7 +310,7 @@ catch(error){
               <div className="col-lg-6">
                 <div className="mb-3">
                   <label className="form-label">First Name</label>
-                  <input type="text"  name ="fname" className="form-control"  {...register("customerFirstName",formValidation.projectTitle)} readOnly={readOnly}/>
+                  <input type="text"  name ="fname" className="form-control"  {...register("customerFirstName",formValidation.projectTitle)} readOnly={readOnly} placeholder='John'/>
                   {errors?.customerFirstName?.type==='pattern' && (<small className='errorMsg'>{formValidation.projectTitle.pattern.message}</small>) } 
                   {errors?.customerFirstName?.type==='required' && (<small className='errorMsg'>{formValidation.projectTitle.required}</small>) } 
                 </div>
@@ -289,7 +318,7 @@ catch(error){
               <div className="col-lg-6">
                 <div className="mb-3">
                   <label className="form-label">Last Name</label>
-                  <input type="text"  name ="lname" className="form-control" {...register("customerLastName",formValidation.projectTitle)} readOnly={readOnly}/>
+                  <input type="text"  name ="lname" className="form-control" {...register("customerLastName",formValidation.projectTitle)} readOnly={readOnly}  placeholder='Willson'/>
                   {errors?.customerLastName?.type==='pattern' && (<small className='errorMsg'>{formValidation.projectTitle.pattern.message}</small>) } 
                   {errors?.customerLastName?.type==='required' && (<small className='errorMsg'>{formValidation.projectTitle.required}</small>) } 
                 </div>
@@ -300,7 +329,7 @@ catch(error){
               <div className="col-lg-6">
                 <div className="mb-3">
                   <label className="form-label">Mobile Number</label>
-                  <input type="text"  name ="mobileNo" className="form-control" {...register("customerMobileNumber",formValidation.mobileNumber)} readOnly={readOnly}/>
+                  <input type="text"  name ="mobileNo" className="form-control" {...register("customerMobileNumber",formValidation.mobileNumber)} readOnly={readOnly}  placeholder='+61412345678'/>
                   {errors?.customerMobileNumber?.type==='pattern' && (<small className='errorMsg'>{formValidation.mobileNumber.pattern.message}</small>) } 
                   {errors?.customerMobileNumber?.type==='required' && ( <small className='errorMsg'>{formValidation.mobileNumber.required}</small>) } 
                 </div>
@@ -308,7 +337,7 @@ catch(error){
               <div className="col-lg-6">
                 <div className="mb-3">
                   <label className="form-label">Phone Number</label>
-                  <input type="text"  name ="mobileNo" className="form-control" {...register("customerPhoneNumber",formValidation.mobileNumber)} readOnly={readOnly}/>
+                  <input type="text"  name ="mobileNo" className="form-control" {...register("customerPhoneNumber",formValidation.mobileNumber)} readOnly={readOnly} placeholder='0412 345 678'/>
                   {errors?.customerPhoneNumber?.type==='pattern' && (<small className='errorMsg'>{formValidation.mobileNumber.pattern.message}</small>) } 
                   {errors?.customerPhoneNumber?.type==='required' && ( <small className='errorMsg'>{formValidation.mobileNumber.required}</small>) } 
                 </div>
@@ -390,9 +419,9 @@ catch(error){
             <div className="col-lg-6">
               <div className="mb-3">
                 <label className="form-label">Company Name</label>
-                <input type="text"  name ="companyName" className="form-control" {...register("companyName",formValidation.projectTitle)} readOnly={readOnly}/>
-                {errors?.companyName?.type==='pattern' && (<small className='errorMsg'>{formValidation.projectTitle.pattern.message}</small>) } 
-                  {errors?.companyName?.type==='required' && (<small className='errorMsg'>{formValidation.projectTitle.required}</small>) } 
+                <input type="text"  name ="companyName" className="form-control" {...register("companyName",formValidation.companyName)} readOnly={readOnly} placeholder='MOJO365'/>
+                {errors?.companyName?.type==='pattern' && (<small className='errorMsg'>{formValidation.companyName.pattern.message}</small>) } 
+                  {errors?.companyName?.type==='required' && (<small className='errorMsg'>{formValidation.companyName.required}</small>) } 
               </div>
             </div>
             
@@ -470,7 +499,9 @@ catch(error){
             <div className="col-lg-6">
               <div className="mb-3">
                 <label className="form-label">ABN</label>
-                <input type="text" className="form-control" {...register("abnNumber")} readOnly={readOnly}/>
+                <input type="text" className="form-control" {...register("abnNumber",formValidation.abnNumber)} readOnly={readOnly} placeholder='12 345 678 901'/>
+                {errors?.abnNumber?.type==='pattern' && (<small className='errorMsg'>{formValidation.abnNumber.pattern.message}</small>) } 
+                  {errors?.abnNumber?.type==='required' && (<small className='errorMsg'>{formValidation.abnNumber.required}</small>) } 
               </div>
             </div>
             
@@ -481,7 +512,28 @@ catch(error){
                 <div className="col-lg-6">
                   <div className="mb-3">
                   <label className="form-label">System Brand</label>
-                <input type="text" className="form-control" {...register("systemBrand")} readOnly={readOnly}/>
+                
+                <Controller
+          name="systemBrand" // This should match the name of the field in your data object
+          control={control}
+          defaultValue="brand1" // Set the default value if needed
+          render={({ field }) => (
+            <select {...field}
+            className="select2 form-control select2-hidden-accessible"
+            data-select2-placeholder="Select Brand Type"
+            data-select2-id="select2-data-7-809c"
+            tabIndex={-1}
+            aria-hidden="true"
+            disabled={readOnly}
+            >
+              <option value="brand1">Brand 1</option>
+              <option value="brand2">Brand 2</option>
+              <option value="brand3">Brand 3</option>
+              <option value="brand4">Brand 4</option>
+              <option value="brand5">Brand 5</option>
+            </select>
+          )}
+        />
                   </div>
                 </div>
               </div>
@@ -625,13 +677,15 @@ catch(error){
               <div className="col-lg-6">
                 <div className="mb-3">
                   <label className="form-label">Building Name</label>
-                  <input type="text"  name ="buildingName" className="form-control" {...register("buildingName",{required:true})} readOnly={readOnly} />
+                  <input type="text"  name ="buildingName" className="form-control" {...register("buildingName",{required:true})} readOnly={readOnly} placeholder='Saffron Residency' />
+                  {errors?.buildingName?.type==='required' && (<small className='errorMsg'>{"Building Name is required!!!"}</small>) } 
                 </div>
               </div>
               <div className="col-lg-6">
                 <div className="mb-3">
                   <label className="form-label">Lot No</label>
-                  <input type="number"  name ="lotNo" className="form-control" {...register("lotNumber")} readOnly={readOnly} />
+                  <input type="number"  name ="lotNo" className="form-control" {...register("lotNumber",{required:true})} readOnly={readOnly} placeholder='123' />
+                  {errors?.lotNumber?.type==='required' && (<small className='errorMsg'>{"Lot Number is required!!!"}</small>) } 
                 </div>
               </div>
             </div>
@@ -640,13 +694,15 @@ catch(error){
               <div className="col-lg-6">
                 <div className="mb-3">
                   <label className="form-label">Unit No</label>
-                  <input type="number"  name ="unitNo" className="form-control" {...register("unitNumber")} readOnly={readOnly}/>
+                  <input type="number"  name ="unitNo" className="form-control" {...register("unitNumber",{required:true})} readOnly={readOnly} placeholder='5'/>
+                  {errors?.unitNumber?.type==='required' && (<small className='errorMsg'>{"Unit Number is required!!!"}</small>) } 
                 </div>
               </div>
               <div className="col-lg-6">
                 <div className="mb-3">
                   <label className="form-label">Street Type</label>
-                  <input type="number"  name ="streetType" className="form-control" {...register("streetTypeSuffix")} readOnly={readOnly}/>
+                  <input type="text"  name ="streetType" className="form-control" {...register("streetTypeSuffix",{required:true})} readOnly={readOnly} placeholder='Crescent'/>
+                  {errors?.streetTypeSuffix?.type==='required' && (<small className='errorMsg'>{"Street Type is required!!!"}</small>) } 
                 </div>
               </div>
             </div>
@@ -654,13 +710,15 @@ catch(error){
               <div className="col-lg-6">
                 <div className="mb-3">
                   <label className="form-label">Street Name</label>
-                  <input type="text" name ="streetName"  className="form-control" {...register("streetName")} readOnly={readOnly} />
+                  <input type="text" name ="streetName"  className="form-control" {...register("streetName",{required:true})} readOnly={readOnly} placeholder='George Street'/>
+                  {errors?.streetName?.type==='required' && (<small className='errorMsg'>{"Street Name is required!!!"}</small>) } 
                 </div>
               </div>
               <div className="col-lg-6">
                 <div className="mb-3">
                   <label className="form-label">Street No</label>
-                  <input type="number" name ="streetNo" className="form-control" {...register("streetNumber")} readOnly={readOnly}/>
+                  <input type="number" name ="streetNo" className="form-control" {...register("streetNumber",{required:true})} readOnly={readOnly} placeholder='47'/>
+                  {errors?.streetNumber?.type==='required' && (<small className='errorMsg'>{"Street Number is required!!!"}</small>) } 
                 </div>
               </div>
             </div>
@@ -668,7 +726,8 @@ catch(error){
               <div className="col-lg-6">
                 <div className="mb-3">
                   <label className="form-label">Suburb</label>
-                  <input type="text" name ="streetName"  className="form-control" {...register("suburb")} />
+                  <input type="text" name ="streetName"  className="form-control" {...register("suburb",{required:true})} placeholder='New Farm'/>
+                  {errors?.suburb?.type==='required' && (<small className='errorMsg'>{"Suburb Name is required!!!"}</small>) } 
                 </div>
               </div>
               
@@ -744,7 +803,9 @@ catch(error){
             <div className="col-lg-6">
               <div className="mb-3">
                 <label className="form-label">Post code</label>
-                <input type="number" name="postCode" className="form-control" {...register("postcode")} readOnly={readOnly}/>
+                <input type="number" name="postCode" className="form-control" {...register("postcode",formValidation.postcode)} readOnly={readOnly} placeholder='4000AB'/>
+                {errors?.postCode?.type==='pattern' && (<small className='errorMsg'>{formValidation.postcode.pattern.message}</small>) } 
+                  {errors?.postCode?.type==='required' && (<small className='errorMsg'>{formValidation.postcode.required}</small>) } 
               </div>
             </div>
             <div className="container">
@@ -759,7 +820,7 @@ catch(error){
                 </button>
                 {/* -------------------SUBMIT-------------------------------- */}
                 <button className="btn btn-primary btn-medium btn-icon-text" type='submit' disabled={readOnly}>
-                  <i className="bi bi-save" /> <span className="text" >Submit</span>
+                  <i className="bi bi-save" /> <span className="text" >Save</span>
                 </button>
               </div>
             </div>

@@ -90,7 +90,8 @@ const Customers = () => {
                   city:row.suburb,
                   pipCode:row.postcode
                 }))
-
+                setCustomerData(fetchedData)
+                setRows(filteredData) 
               }catch(e){
                   console.log("error"+e)
               }
@@ -106,15 +107,15 @@ const Customers = () => {
         setLoading(false)
       }
     }
-    if(loading){
-   fetchData(); 
-    }
+   
     return ()=>{
       console.log("Do Nothing")
-        setCustomerData(fetchedData)
-        setRows(filteredData) 
+      if(loading){
+        fetchData(); 
+         }
+        
     }
-  },[loading])
+  },[])
   return (
     <Box component="main" sx={{ flexGrow: 1, p: 2, m: 0 }}>
       <Header
